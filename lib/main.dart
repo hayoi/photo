@@ -1,111 +1,116 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:photo/trans/translations.dart';
 
-void main() => runApp(MyApp());
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:photo/redux/app/app_state.dart';
+import 'package:photo/redux/store.dart';
+import 'package:flutter/foundation.dart';
+import 'package:photo/features/settings/settings_option.dart';
+import 'package:photo/features/settings/settings_option_page.dart';
+import 'package:photo/features/settings/text_scale.dart';
+import 'package:photo/features/settings/theme.dart';
+import 'package:photo/data/db/database_client.dart';
+import 'package:photo/features/home/home_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+Future<Null> main() async {
+  var store = await createStore();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MyApp(store));
+  });
+}
+
+class MyApp extends StatefulWidget {
+  final Store<AppState> store;
+
+  MyApp(this.store);
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  SettingsOptions _options;
+
+  @override
+  void initState() {
+    super.initState();
+    DatabaseClient();
+    _options = new SettingsOptions(
+      theme: AppTheme().appTheme,
+      textScaleFactor: appTextScaleValues[0],
+      platform: defaultTargetPlatform,
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+    SharedPreferences.getInstance().then((prefs) {
+      var isDark = prefs.getBool("isDark") ?? false;
+      if (isDark) {
+        AppTheme.configure(ThemeName.DARK);
+        setState(() {
+          _options = _options.copyWith(theme: AppTheme().appTheme);
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+    return StoreProvider<AppState>(
+        store: widget.store,
+        child: MaterialApp(
+          title: 'photo',
+          debugShowCheckedModeBanner: false,
+          routes: _routes(),
+          theme: _options.theme.copyWith(platform: _options.platform),
+          builder: (BuildContext context, Widget child) {
+            return new Directionality(
+              textDirection: _options.textDirection,
+              child: _applyTextScaleFactor(child),
+            );
+          },
+          localizationsDelegates: [
+            const TranslationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+          supportedLocales: [
+            const Locale('zh', 'CH'),
+            const Locale('en', 'US'),
+          ],
+        ));
+  }
+
+
+  Widget _applyTextScaleFactor(Widget child) {
+    return new Builder(
+      builder: (BuildContext context) {
+        return new MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+                textScaleFactor: _options.textScaleFactor.scale,
+              ),
+          child: child,
+        );
+      },
     );
+  }
+
+  void _handleOptionsChanged(SettingsOptions newOptions) {
+    setState(() {
+      _options = newOptions;
+    });
+  }
+
+  Map<String, WidgetBuilder> _routes() {
+    return <String, WidgetBuilder>{
+      "/settings": (_) => SettingsOptionsPage(
+            options: _options,
+            onOptionsChanged: _handleOptionsChanged,
+          ),
+      "/": (_) => new HomeView(),
+    };
   }
 }
