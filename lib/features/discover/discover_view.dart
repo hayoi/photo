@@ -42,7 +42,7 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
     with SingleTickerProviderStateMixin {
   final _SearchDemoSearchDelegate _delegate = _SearchDemoSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  TabController _controller;
+//  TabController _controller;
   var cpr;
   var upr;
   var dpr;
@@ -50,8 +50,8 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
   @override
   void initState() {
     super.initState();
-    _controller = TabController(
-        vsync: this, length: this.widget.viewModel.collections.length + 1);
+//    _controller = TabController(
+//        vsync: this, length: this.widget.viewModel.collections.length + 1);
     if (this.widget.viewModel.collections.length == 0) {
       this.widget.viewModel.getCollections(true);
     }
@@ -59,7 +59,7 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
 
   @override
   void dispose() {
-    _controller.dispose();
+//    _controller.dispose();
     super.dispose();
   }
 
@@ -141,7 +141,7 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
     var widget;
 
     widget = TabBarView(
-      controller: _controller,
+//      controller: _controller,
       children: [
         PhotoView(orderBy: "latest"),
       ]..addAll(getTabPPage()),
@@ -151,7 +151,7 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
       child: Scaffold(
         appBar: AppBar(
           bottom: TabBar(
-            controller: _controller,
+//            controller: _controller,
             isScrollable: true,
             tabs: [
               Tab(icon: Text("latest")),
