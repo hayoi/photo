@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:photo/data/model/photo_data.dart';
+import 'package:photo/data/model/collection_data.dart';
 import 'package:photo/data/model/choice_data.dart';
+import 'package:photo/features/collection/collection_view.dart';
+import 'package:photo/features/photo/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -10,6 +12,7 @@ import 'package:photo/redux/app/app_state.dart';
 import 'package:photo/features/discover/discover_view_model.dart';
 import 'package:photo/redux/action_report.dart';
 import 'package:photo/utils/progress_dialog.dart';
+import 'package:photo/features/widget/swipe_list_item.dart';
 
 class DiscoverView extends StatelessWidget {
   DiscoverView({Key key}) : super(key: key);
@@ -35,22 +38,76 @@ class DiscoverViewContent extends StatefulWidget {
   _DiscoverViewContentState createState() => _DiscoverViewContentState();
 }
 
-class _DiscoverViewContentState extends State<DiscoverViewContent> {
+class _DiscoverViewContentState extends State<DiscoverViewContent>
+    with SingleTickerProviderStateMixin {
   final _SearchDemoSearchDelegate _delegate = _SearchDemoSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  TabController _controller;
+  var cpr;
+  var upr;
+  var dpr;
 
   @override
   void initState() {
     super.initState();
+    _controller = TabController(
+        vsync: this, length: this.widget.viewModel.collections.length + 1);
+    if (this.widget.viewModel.collections.length == 0) {
+      this.widget.viewModel.getCollections(true);
+    }
   }
-  
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(DiscoverViewContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     Future.delayed(Duration.zero, () {
+      if (this.widget.viewModel.createCollectionReport?.status ==
+          ActionStatus.running) {
+        if (cpr == null) {
+          cpr = new ProgressDialog(context);
+        }
+        cpr.setMessage("Creating...");
+        cpr.show();
+      } else {
+        if (cpr != null && cpr.isShowing()) {
+          cpr.hide();
+          cpr = null;
+        }
+      }
+
+      if (this.widget.viewModel.updateCollectionReport?.status ==
+          ActionStatus.running) {
+        if (upr == null) {
+          upr = new ProgressDialog(context);
+        }
+        upr.setMessage("Updating...");
+        upr.show();
+      } else {
+        if (upr != null && upr.isShowing()) {
+          upr.hide();
+          upr = null;
+        }
+      }
+
+      if (this.widget.viewModel.deleteCollectionReport?.status ==
+          ActionStatus.running) {
+        if (dpr == null) {
+          dpr = new ProgressDialog(context);
+        }
+        dpr.setMessage("Deleting...");
+        dpr.show();
+      } else {
+        if (dpr != null && dpr.isShowing()) {
+          dpr.hide();
+          dpr = null;
+        }
+      }
     });
   }
 
@@ -59,30 +116,49 @@ class _DiscoverViewContentState extends State<DiscoverViewContent> {
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
+  List<Widget> getTabPPage() {
+    List<Widget> list = [];
+    for (var c in this.widget.viewModel.collections) {
+      list.add(CollectionView(
+        collection: c.id,
+      ));
+    }
+
+    return list;
+  }
+
+  List<Tab> getTab() {
+    List<Tab> list = [];
+    for (var c in this.widget.viewModel.collections) {
+      list.add(Tab(icon: Text(c.title ?? "")));
+    }
+
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     var widget;
 
     widget = TabBarView(
+      controller: _controller,
       children: [
-        Icon(Icons.directions_car),
-        Icon(Icons.directions_transit),
-        Icon(Icons.directions_bike),
-      ],
+        PhotoView(orderBy: "latest"),
+      ]..addAll(getTabPPage()),
     );
     return DefaultTabController(
-      length: 3,
+      length: this.widget.viewModel.collections.length + 1,
       child: Scaffold(
         appBar: AppBar(
           bottom: TabBar(
+            controller: _controller,
+            isScrollable: true,
             tabs: [
-              Tab(icon: Icon(Icons.directions_car)),
-              Tab(icon: Icon(Icons.directions_transit)),
-              Tab(icon: Icon(Icons.directions_bike)),
-            ],
+              Tab(icon: Text("latest")),
+            ]..addAll(getTab()),
           ),
           title: Text("Discover"),
-		  actions: _buildActionButton(),
+          actions: _buildActionButton(),
         ),
         body: widget,
       ),
@@ -112,7 +188,6 @@ class _DiscoverViewContentState extends State<DiscoverViewContent> {
     // Causes the app to rebuild with the new _selectedChoice.
     setState(() {});
   }
-
 }
 
 const List<Choice> choices = const <Choice>[

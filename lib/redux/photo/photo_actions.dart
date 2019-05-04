@@ -6,8 +6,24 @@ import 'package:photo/data/model/page_data.dart';
 class GetPhotosAction {
   final String actionName = "GetPhotosAction";
   final bool isRefresh;
+  final String orderBy;
 
-  GetPhotosAction({this.isRefresh});
+  GetPhotosAction({this.orderBy, this.isRefresh});
+}
+
+class GetCollectionPhotosAction {
+  final String actionName = "GetCollectionPhotosAction";
+  final bool isRefresh;
+  final int id;
+
+  GetCollectionPhotosAction({this.id, this.isRefresh});
+}
+class SyncCollectionPhotosAction {
+  final String actionName = "SyncCollectionPhotosAction";
+  final Page page;
+  final int collectionId;
+
+  SyncCollectionPhotosAction({this.collectionId, this.page});
 }
 
 class GetPhotoAction {

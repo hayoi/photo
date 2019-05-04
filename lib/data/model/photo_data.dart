@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:photo/data/model/currentusercollectionsitem_data.dart';
+import 'package:photo/data/model/page_data.dart' as prefix0;
+import 'package:photo/data/model/page_data.dart';
 import 'package:photo/data/model/tagsitem_data.dart';
 import 'package:photo/data/model/urls_data.dart';
 import 'package:photo/data/model/location_data.dart';
@@ -47,46 +49,41 @@ class Photo {
     this.exif,
   });
 
-  Photo.fromJson(Map<String, dynamic>  map) :
-        color = map['color']  ?? "",
-        createdAt = map['created_at'] == null ? null
-               : DateTime.parse(map["created_at"]),
-        description = map['description']  ?? "",
-        likedByUser = map['liked_by_user']  ?? false,
-        urls = map['urls'] == null
+  Photo.fromJson(Map<String, dynamic> map)
+      : color = map['color'] ?? "",
+        createdAt = map['created_at'] == null
             ? null
-            : Urls.fromJson(map['urls']),
-        updatedAt = map['updated_at'] == null ? null
-               : DateTime.parse(map["updated_at"]),
-        downloads = map['downloads']  ?? 0,
-        width = map['width']  ?? 0,
-        location = map['location'] == null
+            : DateTime.parse(map["created_at"]),
+        description = map['description'] ?? "",
+        likedByUser = map['liked_by_user'] ?? false,
+        urls = map['urls'] == null ? null : Urls.fromJson(map['urls']),
+        updatedAt = map['updated_at'] == null
             ? null
-            : Location.fromJson(map['location']),
-        links = map['links'] == null
-            ? null
-            : Links.fromJson(map['links']),
-        id = map['id']  ?? "",
-        user = map['user'] == null
-            ? null
-            : User.fromJson(map['user']),
-        height = map['height']  ?? 0,
-        likes = map['likes']  ?? 0,
-        exif = map['exif'] == null
-            ? null
-            : Exif.fromJson(map['exif']);
+            : DateTime.parse(map["updated_at"]),
+        downloads = map['downloads'] ?? 0,
+        width = map['width'] ?? 0,
+        location =
+            map['location'] == null ? null : Location.fromJson(map['location']),
+        links = map['links'] == null ? null : Links.fromJson(map['links']),
+        id = map['id'] ?? "",
+        user = map['user'] == null ? null : User.fromJson(map['user']),
+        height = map['height'] ?? 0,
+        likes = map['likes'] ?? 0,
+        exif = map['exif'] == null ? null : Exif.fromJson(map['exif']);
 
   Map<String, dynamic> toJson() => {
         'current_user_collections': currentUserCollections,
         'color': color,
-        'created_at': createdAt == null? null
-               : DateFormat('yyyy-MM-dd HH:mm:ss').format(createdAt),
+        'created_at': createdAt == null
+            ? null
+            : DateFormat('yyyy-MM-dd HH:mm:ss').format(createdAt),
         'description': description,
         'liked_by_user': likedByUser,
         'tags': tags,
         'urls': urls.toJson(),
-        'updated_at': updatedAt == null? null
-               : DateFormat('yyyy-MM-dd HH:mm:ss').format(updatedAt),
+        'updated_at': updatedAt == null
+            ? null
+            : DateFormat('yyyy-MM-dd HH:mm:ss').format(updatedAt),
         'downloads': downloads,
         'width': width,
         'location': location.toJson(),
@@ -118,7 +115,8 @@ class Photo {
     Exif exif,
   }) {
     return Photo(
-      currentUserCollections: currentUserCollections ?? this.currentUserCollections,
+      currentUserCollections:
+          currentUserCollections ?? this.currentUserCollections,
       color: color ?? this.color,
       createdAt: createdAt ?? this.createdAt,
       description: description ?? this.description,
@@ -137,6 +135,11 @@ class Photo {
       exif: exif ?? this.exif,
     );
   }
-
 }
 
+class PhotoOfCollection {
+  int id;
+  Page page;
+  Map<String, Photo> photos;
+
+}

@@ -1,20 +1,36 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:photo/data/model/page_data.dart';
 import 'package:photo/data/model/photo_data.dart';
 import 'package:photo/data/network_common.dart';
 
 class PhotoRepository {
   const PhotoRepository();
 
-  Future<Map> getPhotosList(String sorting, int page, int limit) {
-    return new NetworkCommon().dio.get("photo/", queryParameters: {
-      "sorting": sorting,
+  Future<Page> getPhotosList(String sorting, int page, int limit) {
+    return new NetworkCommon().dio.get("photos", queryParameters: {
+      "order_by": sorting,
       "page": page,
-      "limit": limit
+      "per_page": limit
     }).then((d) {
       var results = new NetworkCommon().decodeResp(d);
+      Page page = new NetworkCommon().decodePage(d);
+      page.data =
+      results.map<Photo>((item) => new Photo.fromJson(item)).toList();
+      return page;
+    });
+  }
 
-      return results;
+  Future<Page> getCollectionPhotos(int id, int page, int limit) {
+    return new NetworkCommon().dio.get("collections/${id}/photos", queryParameters: {
+      "page": page,
+      "per_page": limit
+    }).then((d) {
+      var results = new NetworkCommon().decodeResp(d);
+      Page page = new NetworkCommon().decodePage(d);
+      page.data =
+          results.map<Photo>((item) => new Photo.fromJson(item)).toList();
+      return page;
     });
   }
 

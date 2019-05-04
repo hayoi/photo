@@ -41,22 +41,18 @@ class _HomeViewContentState extends State<HomeViewContent> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   PageController pageController;
   int page = 0;
-  List pages = ["Home","Notice","Mine"];
-
+  List pages = ["Discover", "Follow", "Me"];
 
   @override
   void initState() {
     super.initState();
-	pageController = PageController(initialPage: this.page);
+    pageController = PageController(initialPage: this.page);
   }
-  
-
 
   @override
   void didUpdateWidget(HomeViewContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    Future.delayed(Duration.zero, () {
-    });
+    Future.delayed(Duration.zero, () {});
   }
 
   void showError(String error) {
@@ -68,15 +64,15 @@ class _HomeViewContentState extends State<HomeViewContent> {
   Widget build(BuildContext context) {
     var widget;
 
-	widget = PageView(
-        children: <Widget>[DiscoverView(), FollowView(), MeView()],
-        controller: pageController,
-        onPageChanged: onPageChanged,
-      );
+    widget = PageView(
+      children: <Widget>[DiscoverView(), FollowView(), MeView()],
+      controller: pageController,
+      onPageChanged: onPageChanged,
+    );
     return Scaffold(
-      key: _scaffoldKey,
-      body: widget,
-	  bottomNavigationBar: BottomNavigationBar(items: [
+        key: _scaffoldKey,
+        body: widget,
+        bottomNavigationBar: BottomNavigationBar(items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
               title: Text(pages[0]),
@@ -89,14 +85,12 @@ class _HomeViewContentState extends State<HomeViewContent> {
               icon: Icon(Icons.account_box),
               title: Text(pages[2]),
               backgroundColor: Colors.blue)
-        ], onTap: onTap, currentIndex: page)
-    );
+        ], onTap: onTap, currentIndex: page));
   }
-  
+
   void onTap(int index) {
     pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.ease);
+        duration: const Duration(milliseconds: 300), curve: Curves.ease);
   }
 
   void onPageChanged(int page) {
@@ -104,6 +98,4 @@ class _HomeViewContentState extends State<HomeViewContent> {
       this.page = page;
     });
   }
-
-
 }

@@ -1,30 +1,54 @@
 import 'package:redux/redux.dart';
-import 'package:photo/data/model/photo_data.dart';
+import 'package:photo/data/model/collection_data.dart';
 import 'package:photo/redux/action_report.dart';
 import 'package:photo/redux/app/app_state.dart';
-import 'package:photo/redux/photo/photo_actions.dart';
+import 'package:photo/redux/collection/collection_actions.dart';
 
 class DiscoverViewModel {
-  final Photo photo;
-  final List<Photo> photos;
-  final Function(bool) getPhotos;
-  final ActionReport getPhotosReport;
+  final Collection collection;
+  final List<Collection> collections;
+  final Function(bool) getCollections;
+  final ActionReport getCollectionsReport;
+  final Function(Collection) createCollection;
+  final ActionReport createCollectionReport;
+  final Function(Collection) updateCollection;
+  final ActionReport updateCollectionReport;
+  final Function(Collection) deleteCollection;
+  final ActionReport deleteCollectionReport;
 
   DiscoverViewModel({
-    this.photo,
-    this.photos,
-    this.getPhotos,
-    this.getPhotosReport,
+    this.collection,
+    this.collections,
+    this.getCollections,
+    this.getCollectionsReport,
+    this.createCollection,
+    this.createCollectionReport,
+    this.updateCollection,
+    this.updateCollectionReport,
+    this.deleteCollection,
+    this.deleteCollectionReport,
   });
 
   static DiscoverViewModel fromStore(Store<AppState> store) {
     return DiscoverViewModel(
-      photo: store.state.photoState.photo,
-      photos: store.state.photoState.photos.values.toList() ?? [],
-      getPhotos: (isRefresh) {
-        store.dispatch(GetPhotosAction(isRefresh: isRefresh));
+      collection: store.state.collectionState.collection,
+      collections: store.state.collectionState.collections.values.toList() ?? [],
+      getCollections: (isRefresh) {
+        store.dispatch(GetCollectionsAction(isRefresh: isRefresh));
       },
-      getPhotosReport: store.state.photoState.status["GetPhotosAction"],
+      getCollectionsReport: store.state.collectionState.status["GetCollectionsAction"],
+      createCollection: (collection) {
+        store.dispatch(CreateCollectionAction(collection: collection));
+      },
+      createCollectionReport: store.state.collectionState.status["CreateCollectionAction"],
+      updateCollection: (collection) {
+        store.dispatch(UpdateCollectionAction(collection: collection));
+      },
+      updateCollectionReport: store.state.collectionState.status["UpdateCollectionAction"],
+      deleteCollection: (collection) {
+        store.dispatch(DeleteCollectionAction(collection: collection));
+      },
+      deleteCollectionReport: store.state.collectionState.status["DeleteCollectionAction"],
     );
   }
 }

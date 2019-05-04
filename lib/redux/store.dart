@@ -1,3 +1,4 @@
+import 'package:photo/redux/collection/collection_middleware.dart';
 import 'package:photo/redux/photo/photo_middleware.dart';
 import 'package:photo/redux/user/user_middleware.dart';
 import 'package:logging/logging.dart';
@@ -11,6 +12,7 @@ Future<Store<AppState>> createStore() async {
     appReducer,
     initialState: AppState.initial(),
     middleware: []
+      ..addAll(createCollectionMiddleware())
       ..addAll(createPhotoMiddleware())
       ..addAll(createUserMiddleware())
       ..addAll([

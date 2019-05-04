@@ -62,11 +62,11 @@ Middleware<AppState> _createGetUsers(
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
     running(next, action);
     if (action.isRefresh) {
-      store.state.userState.page.currPage = 1;
+      store.state.userState.page.last = 1;
       store.state.userState.users.clear();
     } else {
-      var p = ++store.state.userState.page.currPage;
-      if (p > ++store.state.userState.page.totalPage) {
+      var p = ++store.state.userState.page.last;
+      if (p > ++store.state.userState.page.next) {
         noMoreItem(next, action);
         return;
       }
@@ -74,14 +74,14 @@ Middleware<AppState> _createGetUsers(
     repository
         .getUsersList(
             "sorting",
-            store.state.userState.page.currPage,
-            store.state.userState.page.pageSize)
+            store.state.userState.page.last,
+            store.state.userState.page.prev)
         .then((map) {
       if (map.isNotEmpty) {
         var page = Page(
-            currPage: map["currPage"],
-            totalPage: map["totalPage"],
-            totalCount: map["totalCount"]);
+            last: map["currPage"],
+            next: map["totalPage"],
+            first: map["totalCount"]);
         var l = map["list"] ?? List();
         List<User> list =
             l.map<User>((item) => new User.fromJson(item)).toList();

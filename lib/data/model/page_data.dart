@@ -1,12 +1,13 @@
 class Page {
-  int totalCount;
-  int pageSize;
-  int totalPage;
-  int currPage;
+  int first;
+  int prev;
+  int next;
+  int last;
+  dynamic data;
 
   Page(
-      {this.totalCount = 0,
-      this.pageSize = 30,
-      this.totalPage = 1,
-      this.currPage = 0});
+      {this.first = 1,
+      this.prev = 1,
+      this.next = 1,
+      this.last = 1});
 }

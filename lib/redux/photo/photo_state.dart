@@ -8,12 +8,14 @@ class PhotoState {
   final Photo photo;
   final Map<String, ActionReport> status;
   final Page page;
+  final Map<int, PhotoOfCollection> collectionPhotos;
 
   PhotoState({
     @required this.photos,
     @required this.photo,
     @required this.status,
     @required this.page,
+    @required this.collectionPhotos
   });
 
   PhotoState copyWith({
@@ -21,12 +23,14 @@ class PhotoState {
     Photo photo,
     Map<String, ActionReport> status,
     Page page,
+    Map<int, PhotoOfCollection> collectionPhotos,
   }) {
     return PhotoState(
       photos: photos ?? this.photos ?? Map(),
       photo: photo ?? this.photo,
       status: status ?? this.status,
       page: page ?? this.page,
+      collectionPhotos: collectionPhotos??this.collectionPhotos,
     );
   }
 }

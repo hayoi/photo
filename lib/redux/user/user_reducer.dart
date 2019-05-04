@@ -20,10 +20,10 @@ UserState _syncUsers(UserState state, SyncUsersAction action) {
   for (var user in action.users) {
     state.users.update(user.id.toString(), (v) => user, ifAbsent: () => user);
   }
-  state.page.currPage = action.page.currPage;
-  state.page.pageSize = action.page.pageSize;
-  state.page.totalCount = action.page.totalCount;
-  state.page.totalPage = action.page.totalPage;
+  state.page.last = action.page.last;
+  state.page.prev = action.page.prev;
+  state.page.first = action.page.first;
+  state.page.next = action.page.next;
   return state.copyWith(users: state.users);
 }
 
