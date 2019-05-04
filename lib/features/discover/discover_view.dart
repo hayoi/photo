@@ -42,16 +42,23 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
     with SingleTickerProviderStateMixin {
   final _SearchDemoSearchDelegate _delegate = _SearchDemoSearchDelegate();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-//  TabController _controller;
-  var cpr;
   var upr;
   var dpr;
+  var cpr;
+  TabController _controller;
+  List<Tab> _tabs = [];
+  List<Widget> _views = [];
 
   @override
   void initState() {
     super.initState();
-//    _controller = TabController(
-//        vsync: this, length: this.widget.viewModel.collections.length + 1);
+    _views.add(PhotoView(orderBy: "latest"));
+    if (this.widget.viewModel.collections.length > 0)
+      _views.addAll(getTabPPage());
+    _tabs.add(Tab(icon: Text("latest")));
+    if (this.widget.viewModel.collections.length > 0)
+      _tabs.addAll(getTab());
+    _controller = _makeNewTabController();
     if (this.widget.viewModel.collections.length == 0) {
       this.widget.viewModel.getCollections(true);
     }
@@ -59,7 +66,7 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
 
   @override
   void dispose() {
-//    _controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -67,6 +74,21 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
   void didUpdateWidget(DiscoverViewContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     Future.delayed(Duration.zero, () {
+      if (this.widget.viewModel.getCollectionsReport?.status ==
+          ActionStatus.complete) {
+        setState(() {
+          _views.clear();
+          _views.add(PhotoView(orderBy: "latest"));
+          if (this.widget.viewModel.collections.length > 0)
+            _views.addAll(getTabPPage());
+          _tabs.clear();
+          _tabs.add(Tab(icon: Text("latest")));
+          if (this.widget.viewModel.collections.length > 0)
+            _tabs.addAll(getTab());
+          _controller = _makeNewTabController();
+        });
+      }
+
       if (this.widget.viewModel.createCollectionReport?.status ==
           ActionStatus.running) {
         if (cpr == null) {
@@ -116,6 +138,11 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
+  TabController _makeNewTabController() => TabController(
+        vsync: this,
+        length: _tabs.length,
+      );
+
   List<Widget> getTabPPage() {
     List<Widget> list = [];
     for (var c in this.widget.viewModel.collections) {
@@ -141,27 +168,20 @@ class _DiscoverViewContentState extends State<DiscoverViewContent>
     var widget;
 
     widget = TabBarView(
-//      controller: _controller,
-      children: [
-        PhotoView(orderBy: "latest"),
-      ]..addAll(getTabPPage()),
+      controller: _controller,
+      children: _views,
     );
-    return DefaultTabController(
-      length: this.widget.viewModel.collections.length + 1,
-      child: Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(
-//            controller: _controller,
-            isScrollable: true,
-            tabs: [
-              Tab(icon: Text("latest")),
-            ]..addAll(getTab()),
-          ),
-          title: Text("Discover"),
-          actions: _buildActionButton(),
+    return Scaffold(
+      appBar: AppBar(
+        bottom: TabBar(
+          controller: _controller,
+          isScrollable: true,
+          tabs: _tabs,
         ),
-        body: widget,
+        title: Text("Discover"),
+        actions: _buildActionButton(),
       ),
+      body: widget,
     );
   }
 
