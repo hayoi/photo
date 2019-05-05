@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo/data/model/photo_data.dart';
+import 'package:photo/features/viewphoto/viewphoto_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -23,15 +24,18 @@ class CollectionView extends StatelessWidget {
       converter: (store) => CollectionViewModel.fromStore(store, collection),
       builder: (_, viewModel) => CollectionViewContent(
             viewModel: viewModel,
+            collection: collection,
           ),
     );
   }
 }
 
 class CollectionViewContent extends StatefulWidget {
+  final int collection;
   final CollectionViewModel viewModel;
 
-  CollectionViewContent({Key key, this.viewModel}) : super(key: key);
+  CollectionViewContent({Key key, this.viewModel, this.collection})
+      : super(key: key);
 
   @override
   _CollectionViewContentState createState() => _CollectionViewContentState();
@@ -122,17 +126,28 @@ class _CollectionViewContentState extends State<CollectionViewContent> {
   _createItem(BuildContext context, int index) {
     if (index < this.widget.viewModel.photos?.length) {
       return Container(
-          child: Card(
-            child: Stack(
-              children: <Widget>[
-                new CachedNetworkImage(
-                  imageUrl: this.widget.viewModel.photos[index].urls.small,
-                  placeholder: (context, url) =>
-                      new CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
-                )
-              ],
-            ),
+          padding: EdgeInsets.all(2.0),
+          child: Stack(
+            children: <Widget>[
+              Hero(
+                tag: this.widget.viewModel.photos[index].id,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewPhotoView(
+                              id: this.widget.collection, pageIndex: index),
+                        ),
+                      ),
+                  child: new CachedNetworkImage(
+                    imageUrl: this.widget.viewModel.photos[index].urls.small,
+                    placeholder: (context, url) =>
+                        new CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ],
           ),
           decoration: BoxDecoration(
               border: Border(

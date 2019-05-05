@@ -37,6 +37,7 @@ dependencies:
   flutter_staggered_grid_view: ^0.2.7
   #badge: ^0.0.3
   common_utils: 1.1.1
+  photo_view: ^0.3.1
 
 dev_dependencies:
   flutter_test:

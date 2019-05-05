@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo/data/model/photo_data.dart';
+import 'package:photo/features/viewphoto/viewphoto_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -72,19 +73,17 @@ class _PhotoViewContentState extends State<PhotoViewContent> {
     widget = NotificationListener(
         onNotification: _onNotification,
         child: RefreshIndicator(
-          key: _refreshIndicatorKey,
-          onRefresh: _handleRefresh,
-          child: new StaggeredGridView.countBuilder(
-            controller: _scrollController,
-            crossAxisCount: 2,
-            itemCount: this.widget.viewModel.photos.length,
-            itemBuilder: (_, int index) => _createItem(context, index),
-            staggeredTileBuilder: (int index) =>
-            new StaggeredTile.fit(1),
-            mainAxisSpacing: 0.0,
-            crossAxisSpacing: 0.0,
-          )
-        ));
+            key: _refreshIndicatorKey,
+            onRefresh: _handleRefresh,
+            child: new StaggeredGridView.countBuilder(
+              controller: _scrollController,
+              crossAxisCount: 2,
+              itemCount: this.widget.viewModel.photos.length,
+              itemBuilder: (_, int index) => _createItem(context, index),
+              staggeredTileBuilder: (int index) => new StaggeredTile.fit(1),
+              mainAxisSpacing: 0.0,
+              crossAxisSpacing: 0.0,
+            )));
     return Scaffold(
       key: _scaffoldKey,
       body: widget,
@@ -127,18 +126,28 @@ class _PhotoViewContentState extends State<PhotoViewContent> {
   _createItem(BuildContext context, int index) {
     if (index < this.widget.viewModel.photos?.length) {
       return Container(
-          child: Card(
-
-            child: Stack(
-              children: <Widget>[
-                new CachedNetworkImage(
-                  imageUrl: this.widget.viewModel.photos[index].urls.small,
-                  placeholder: (context, url) =>
-                      new CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
-                )
-              ],
-            ),
+          padding: EdgeInsets.all(2.0),
+          child: Stack(
+            children: <Widget>[
+              Hero(
+                tag: this.widget.viewModel.photos[index].id,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ViewPhotoView(id: 0, pageIndex: index),
+                        ),
+                      ),
+                  child: new CachedNetworkImage(
+                    imageUrl: this.widget.viewModel.photos[index].urls.small,
+                    placeholder: (context, url) =>
+                        new CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ],
           ),
           decoration: BoxDecoration(
               border: Border(

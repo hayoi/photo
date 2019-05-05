@@ -53,7 +53,7 @@ Middleware<AppState> _createGetCollections(CollectionRepository repository) {
         return;
       }
     }
-    repository.getCollectionsList(num, 15).then((page) {
+    repository.getCollectionsList(num, 30).then((page) {
       next(SyncCollectionsAction(page: page, collections: page.data));
       completed(next, action);
     }).catchError((error) {

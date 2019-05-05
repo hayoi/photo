@@ -29,6 +29,7 @@ List<Middleware<AppState>> createPhotoMiddleware([
 
 Middleware<AppState> _createGetPhoto(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     if (action.id == null) {
       idEmpty(next, action);
     } else {
@@ -45,6 +46,7 @@ Middleware<AppState> _createGetPhoto(PhotoRepository repository) {
 
 Middleware<AppState> _createGetPhotos(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     running(next, action);
     int num = store.state.photoState.page.next;
     if (action.isRefresh) {
@@ -81,6 +83,7 @@ Middleware<AppState> _createGetPhotos(PhotoRepository repository) {
 
 Middleware<AppState> _createGetCollectionPhotos(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     running(next, action);
     int num =
         store.state.photoState.collectionPhotos[action.id]?.page?.next ?? 1;
@@ -104,6 +107,7 @@ Middleware<AppState> _createGetCollectionPhotos(PhotoRepository repository) {
 
 Middleware<AppState> _createCreatePhoto(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     running(next, action);
     repository.createPhoto(action.photo).then((item) {
       next(SyncPhotoAction(photo: item));
@@ -116,6 +120,7 @@ Middleware<AppState> _createCreatePhoto(PhotoRepository repository) {
 
 Middleware<AppState> _createUpdatePhoto(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     running(next, action);
     repository.updatePhoto(action.photo).then((item) {
       next(SyncPhotoAction(photo: item));
@@ -128,6 +133,7 @@ Middleware<AppState> _createUpdatePhoto(PhotoRepository repository) {
 
 Middleware<AppState> _createDeletePhoto(PhotoRepository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
     running(next, action);
     repository.deletePhoto(action.photo.id).then((item) {
       next(RemovePhotoAction(id: action.photo.id));
@@ -136,6 +142,14 @@ Middleware<AppState> _createDeletePhoto(PhotoRepository repository) {
       catchError(next, action, error);
     });
   };
+}
+
+bool checkActionRunning(Store<AppState> store, action) {
+  if (store.state.photoState.status[action.actionName].status ==
+      ActionStatus.running) {
+    return true; // do nothing if there is a same action running.
+  }
+  return false;
 }
 
 void catchError(NextDispatcher next, action, error) {
