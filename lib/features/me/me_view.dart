@@ -1,14 +1,9 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:photo/data/model/user_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:photo/redux/app/app_state.dart';
 import 'package:photo/features/me/me_view_model.dart';
-import 'package:photo/redux/action_report.dart';
-import 'package:photo/utils/progress_dialog.dart';
 
 class MeView extends StatelessWidget {
   MeView({Key key}) : super(key: key);
@@ -37,19 +32,15 @@ class MeViewContent extends StatefulWidget {
 class _MeViewContentState extends State<MeViewContent> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   @override
   void initState() {
     super.initState();
   }
-  
-
 
   @override
   void didUpdateWidget(MeViewContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    Future.delayed(Duration.zero, () {
-    });
+    Future.delayed(Duration.zero, () {});
   }
 
   void showError(String error) {
@@ -61,7 +52,10 @@ class _MeViewContentState extends State<MeViewContent> {
   Widget build(BuildContext context) {
     var widget;
 
-	  widget = Text("Hello word");
+    widget = RaisedButton(
+      child: Text("Settings"),
+      onPressed: () => Navigator.of(context).pushNamed("/settings"),
+    );
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -70,6 +64,4 @@ class _MeViewContentState extends State<MeViewContent> {
       body: widget,
     );
   }
-
-
 }

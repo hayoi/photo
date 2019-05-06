@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo/data/model/user_data.dart';
+import 'package:photo/features/collectlist/collectlist_view.dart';
 import 'package:photo/features/discover/discover_view.dart';
 import 'package:photo/features/follow/follow_view.dart';
 import 'package:photo/features/me/me_view.dart';
@@ -41,7 +42,7 @@ class _HomeViewContentState extends State<HomeViewContent> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   PageController pageController;
   int page = 0;
-  List pages = ["Discover", "Follow", "Me"];
+  List pages = ["Discover", "Collection", "Me"];
 
   @override
   void initState() {
@@ -65,7 +66,7 @@ class _HomeViewContentState extends State<HomeViewContent> {
     var widget;
 
     widget = PageView(
-      children: <Widget>[DiscoverView(), FollowView(), MeView()],
+      children: <Widget>[DiscoverView(), CollectListView(), MeView()],
       controller: pageController,
       onPageChanged: onPageChanged,
     );

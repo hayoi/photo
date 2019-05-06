@@ -145,7 +145,7 @@ Middleware<AppState> _createDeletePhoto(PhotoRepository repository) {
 }
 
 bool checkActionRunning(Store<AppState> store, action) {
-  if (store.state.photoState.status[action.actionName].status ==
+  if (store.state.photoState.status[action.actionName]?.status ==
       ActionStatus.running) {
     return true; // do nothing if there is a same action running.
   }

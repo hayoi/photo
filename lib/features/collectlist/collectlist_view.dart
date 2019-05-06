@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo/data/model/collection_data.dart';
 import 'package:photo/data/model/choice_data.dart';
+import 'package:photo/features/collectlist/collection_detail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -57,18 +58,18 @@ class _CollectListViewContentState extends State<CollectListViewContent> {
   void didUpdateWidget(CollectListViewContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     Future.delayed(Duration.zero, () {
-      if (this.widget.viewModel.getCollectionsReport.status ==
-          ActionStatus.complete) {
-        if (this.widget.viewModel.collectionPhotos.length > 0) {
-          int id = this.widget.viewModel.collectionPhotos[0].id;
-          if (this.widget.viewModel.collectionPhotos[id].photos.length == 0) {
-            collectionIndex = 0;
-            this.widget.viewModel.getPhotoOfCollection(true, id);
-          }
-        }
-      }
-      if (this.widget.viewModel.getPhotoOfCollectionReport.status ==
-          ActionStatus.complete) {}
+//      if (this.widget.viewModel.getCollectionsReport?.status ==
+//          ActionStatus.complete) {
+//        if (this.widget.viewModel.collectionPhotos.length > 0) {
+//          int id = this.widget.viewModel.collectionPhotos[0].id;
+//          if (this.widget.viewModel.collectionPhotos[id].photos.length == 0) {
+//            collectionIndex = 0;
+//            this.widget.viewModel.getPhotoOfCollection(true, id);
+//          }
+//        }
+//      }
+//      if (this.widget.viewModel.getPhotoOfCollectionReport?.status ==
+//          ActionStatus.complete) {}
     });
   }
 
@@ -141,21 +142,27 @@ class _CollectListViewContentState extends State<CollectListViewContent> {
       var photo = this
           .widget
           .viewModel
-          .collectionPhotos[this.widget.viewModel.collections[index]?.id ?? 0];
+          .collectionPhotos[this.widget.viewModel.collections[index]?.id ?? 0]
+          ?.photos;
       return Container(
           child: _CollectionListItem(
-            url1: photo?.photos[0]?.urls?.thumb,
-            url2: photo?.photos[1].urls.thumb,
-            url3: photo?.photos[2].urls.thumb,
+            url1:
+                "https://images.unsplash.com/photo-1556610626-9976884aae5b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80",
+            url2:
+                "https://images.unsplash.com/photo-1555086196-a28d9bc9d677?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80",
+            url3:
+                "https://images.unsplash.com/photo-1556822043-c8422d0fd20d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=701&q=80",
+//            url3: photo == null?"":photo[2].urls.thumb,
             collection: this.widget.viewModel.collections[index],
             onTap: () {
-              //Navigator.push(
-              //  context,
-              //  MaterialPageRoute(
-              //    builder: (context) =>
-              //        ViewCollection(collection: this.widget.viewModel.collections[index]),
-              //  ),
-              //);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CollectionDetailView(
+                      collectionId:
+                          this.widget.viewModel.collections[index].id),
+                ),
+              );
             },
           ),
           decoration: BoxDecoration(
@@ -224,39 +231,64 @@ class _CollectionListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: GestureDetector(
+    var screenWidth = MediaQuery.of(context).size.width;
+    return GestureDetector(
             onTap: onTap,
-            child: Column(
+            child: Card(
+        child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Row(children: <Widget>[
-                  new CachedNetworkImage(
-                    imageUrl: url1,
-                    placeholder: (context, url) =>
-                        new CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
-                  ),
-                  new CachedNetworkImage(
-                    imageUrl: url2,
-                    placeholder: (context, url) =>
-                        new CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
-                  ),
-                  new CachedNetworkImage(
-                    imageUrl: url3,
-                    placeholder: (context, url) =>
-                        new CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
-                  )
-                ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      new CachedNetworkImage(
+                        width: screenWidth * 7 / 11,
+                        height: screenWidth * 7 / 11,
+                        imageUrl: url1,
+                        fit: BoxFit.fill,
+                        placeholder: (context, url) =>
+                            new CircularProgressIndicator(),
+                        errorWidget: (context, url, error) =>
+                            new Icon(Icons.error),
+                      ),
+                      Container(
+                        width: screenWidth * 3 / 10,
+                        height: screenWidth * 6 / 11,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new CachedNetworkImage(
+                              width: screenWidth * 3 / 10,
+                              height: (screenWidth * 6 / 22) - 2,
+                              imageUrl: url2,
+                              fit: BoxFit.fill,
+                              placeholder: (context, url) =>
+                                  new CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  new Icon(Icons.error),
+                            ),
+                            new CachedNetworkImage(
+                              width: screenWidth * 3 / 10,
+                              height: (screenWidth * 6 / 22) - 2,
+                              fit: BoxFit.fill,
+                              imageUrl: url3,
+                              placeholder: (context, url) =>
+                                  new CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  new Icon(Icons.error),
+                            )
+                          ],
+                        ),
+                      ),
+                    ]),
                 Text(
                   collection.title ?? "",
                   style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 22.0,
                       color: Theme.of(context).textTheme.body1.color),
                 ),
                 Text(
-                  collection.totalPhotos ?? "0" + " photos",
+                  (collection.totalPhotos?.toString() ?? "0") + " photos",
                   style:
                       TextStyle(color: Theme.of(context).textTheme.body2.color),
                 )
