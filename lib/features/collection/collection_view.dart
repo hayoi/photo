@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo/data/model/photo_data.dart';
 import 'package:photo/features/viewphoto/viewphoto_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:photo/trans/translations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:photo/redux/app/app_state.dart';
 import 'package:photo/features/collection/collection_view_model.dart';

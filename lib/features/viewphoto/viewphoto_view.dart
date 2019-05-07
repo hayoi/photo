@@ -12,8 +12,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 class ViewPhotoView extends StatelessWidget {
-  final int id;
-  final int pageIndex;
+  final int id; //collection id
+  final int pageIndex; //the index of photo in the list
 
   ViewPhotoView({Key key, this.id, this.pageIndex}) : super(key: key);
 
