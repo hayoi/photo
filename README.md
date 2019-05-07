@@ -104,7 +104,7 @@ class GetPhotosAction {
 }
 ```
 #### Edit photo_view.dart
-We use the follor package to list and show photos. import them in pubspec.yaml
+We use the follow package to list and show photos. import them in pubspec.yaml
 ```
   cached_network_image: ^0.7.0
   flutter_staggered_grid_view: ^0.2.7
