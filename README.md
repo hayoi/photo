@@ -16,7 +16,7 @@ Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).
  ### Create CollectListView
  Open Plugin, type "CollectList" in PageName Field, select checkboxs: Query, AppBar, ListView, ActionButton, Search, Type "Collection" in Model Entry Name, copy Collection Json object to Json Field from [Unsplash Collection Api](https://unsplash.com/documentation#list-featured-collections). Type "Collection" in the Model Entry Name and tap "OK" buttom.
  ### Create MeView
- Open Plugin, type "Me" in PageName Field, select checkboxs: Query, AppBar, UI only. Type User in the Model Entry Name and tap "OK" buttom.
+ Open Plugin, type "Me" in PageName Field, select checkboxs: AppBar, UI only. Type User in the Model Entry Name and tap "OK" buttom.
  ### Modify Navigation route
  main.dart
  ```dart
@@ -49,7 +49,7 @@ Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).
 ```
   
  ### Create Photo latest page
- Open Plugin, type "Photo" in PageName Field, select checkboxs: UI only, Query, ListView. Type Photo in the Model Entry Name and tap "OK" 
+ Open Plugin, type "Photo" in PageName Field, select checkboxs: UI only, Query in ViewModel Setting, ListView. Type Photo in the Model Entry Name and tap "OK" 
  #### Edit Photo api
  Edit photo_repository.dart according [Unsplash list-photo Api](https://unsplash.com/documentation#list-photos)
 ```dart
@@ -215,8 +215,186 @@ Add orderBy parameter to photo_view_model.dart
     );
   }
 ```
+now you can the app.
+### Next, Create CollectionView and Middleware
+#### add new action to middleware
+Add new Property in photo_state.dart to save photos of each collection
+```dart
+  final Map<int, PhotoOfCollection> collectionPhotos;
+```
+add new acion in photo_actions.dart
+```dart
+class SyncCollectionPhotosAction {
+  final String actionName = "SyncCollectionPhotosAction";
+  final Page page;
+  final int collectionId;
+
+  SyncCollectionPhotosAction({this.collectionId, this.page});
+}
+```
+in photo_reducer.dart
+```dart
+  TypedReducer<PhotoState, SyncCollectionPhotosAction>(_syncCollectionPhotos),
+  
+PhotoState _syncCollectionPhotos(
+    PhotoState state, SyncCollectionPhotosAction action) {
+  state.collectionPhotos.update(action.collectionId, (v) {
+    v.id = action.collectionId;
+    v.page?.last = action.page?.last;
+    v.page?.prev = action.page?.prev;
+    v.page?.first = action.page?.first;
+    v.page?.next = action.page?.next;
+    for (var photo in action.page?.data) {
+      v.photos
+          ?.update(photo.id.toString(), (vl) => photo, ifAbsent: () => photo);
+    }
+    return v;
+  }, ifAbsent: () {
+    PhotoOfCollection pc = new PhotoOfCollection();
+    pc.id = action.collectionId;
+    Page page = Page();
+    page.last = action.page?.last;
+    page.prev = action.page?.prev;
+    page.first = action.page?.first;
+    page.next = action.page?.next;
+    pc.page = page;
+    pc.photos = Map();
+    for (var photo in action.page?.data) {
+      pc.photos
+          ?.update(photo.id.toString(), (v) => photo, ifAbsent: () => photo);
+    }
+    return pc;
+  });
+  return state.copyWith(collectionPhotos: state.collectionPhotos);
+}
+```
+
+photo_middleware.dart
+```dart
+//add new action to list
+  final getCollectionPhotos = _createGetCollectionPhotos(_repository);
+  
+    TypedMiddleware<AppState, GetCollectionPhotosAction>(getCollectionPhotos),
+
+// new handle function
+Middleware<AppState> _createGetCollectionPhotos(PhotoRepository repository) {
+  return (Store<AppState> store, dynamic action, NextDispatcher next) {
+    if (checkActionRunning(store, action)) return;
+    running(next, action);
+    int num =
+        store.state.photoState.collectionPhotos[action.id]?.page?.next ?? 1;
+    if (action.isRefresh) {
+      num = 1;
+    } else {
+      if (store.state.photoState.collectionPhotos[action.id] != null &&
+          store.state.photoState.collectionPhotos[action.id].page.next <= 0) {
+        noMoreItem(next, action);
+        return;
+      }
+    }
+    repository.getCollectionPhotos(action.id, num, 10).then((page) {
+      next(SyncCollectionPhotosAction(collectionId: action.id, page: page));
+      completed(next, action);
+    }).catchError((error) {
+      catchError(next, action, error);
+    });
+  };
+}
+```
+#### Edit photo network api[Unsplash collection api](https://unsplash.com/documentation#get-a-collections-photos)
+```dart
+  Future<Page> getCollectionPhotos(int id, int page, int limit) {
+    return new NetworkCommon().dio.get("collections/${id}/photos", queryParameters: {
+      "page": page,
+      "per_page": limit
+    }).then((d) {
+      var results = new NetworkCommon().decodeResp(d);
+      Page page = new NetworkCommon().decodePage(d);
+      page.data =
+          results.map<Photo>((item) => new Photo.fromJson(item)).toList();
+      return page;
+    });
+  }
+```
+#### Create Collection View
+ Open Plugin, type "Collection" in PageName Field, select checkboxs: UI only, Query in ViewModel Setting , ListView. Type Photo in the Model Entry Name and tap "OK" 
+Edit collection_View.dart
+```dart
+// add a int property in CollectionView to specify collection id
+  final int collection;
+  
+  edit widget
+    widget = NotificationListener(
+        onNotification: _onNotification,
+        child: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            onRefresh: _handleRefresh,
+            child: new StaggeredGridView.countBuilder(
+              controller: _scrollController,
+              crossAxisCount: 2,
+              itemCount: this.widget.viewModel.photos.length + 1,
+              itemBuilder: (_, int index) => _createItem(context, index),
+              staggeredTileBuilder: (int index) => new StaggeredTile.fit(1),
+              mainAxisSpacing: 0.0,
+              crossAxisSpacing: 0.0,
+            )));
+
+// modify list item
+  _createItem(BuildContext context, int index) {
+    if (index < this.widget.viewModel.photos?.length) {
+      return Container(
+          padding: EdgeInsets.all(2.0),
+          child: Stack(
+            children: <Widget>[
+              Hero(
+                tag: this.widget.viewModel.photos[index].id,
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewPhotoView(
+                              id: this.widget.collection, pageIndex: index),
+                        ),
+                      ),
+                  child: new CachedNetworkImage(
+                    imageUrl: this.widget.viewModel.photos[index].urls.small,
+                    placeholder: (context, url) =>
+                        new CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(color: Theme.of(context).dividerColor))));
+    }
+
+    return Container(
+      height: 44.0,
+      child: Center(
+        child: _getLoadMoreWidget(),
+      ),
+    );
+  }
+```
+Modify collection_view_model.dart
+```dart
+  final Function(bool) getPhotoOfCollection;
+  
+  static CollectionViewModel fromStore(Store<AppState> store, int id) {
+    return CollectionViewModel(
+      photos: store.state.photoState.collectionPhotos[id]?.photos?.values
+          ?.toList() ?? [],
+      getPhotoOfCollection: (isRefresh) {
+        store.dispatch(GetCollectionPhotosAction(id: id, isRefresh: isRefresh));
+      },
+```
 
 
-
-
+  
+  
+  
+  
  
