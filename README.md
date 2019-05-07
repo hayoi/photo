@@ -1,6 +1,6 @@
 # photo
 
-A photo viewer create with a [Plugin](https://github.com/hayoi/haystack). It's so simple to create an Flutter app for Android and IOS.  
+A photo viewer create with a [Flutter App Template Generater](https://github.com/hayoi/haystack). It's so simple to create an Flutter app for Android and IOS.  
 Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).  
 ![discover dark](https://raw.githubusercontent.com/hayoi/photo/master/image/discover_dark.png)
 ![collection list dark](https://raw.githubusercontent.com/hayoi/photo/master/image/collection_list.png)
