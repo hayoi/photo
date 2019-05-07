@@ -1,11 +1,12 @@
 # photo
 
 A photo viewer create with a [Plugin](https://github.com/hayoi/haystack). It's so simple to create an Flutter app for Android and IOS.  
-Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).
-![home](https://raw.githubusercontent.com/hayoi/photo/master/image/dicover.png)
+Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).  
+![discover dark](https://raw.githubusercontent.com/hayoi/photo/master/image/discover_dark.png)
+![collection list dark](https://raw.githubusercontent.com/hayoi/photo/master/image/collection_list.png)
+![settings dark](https://raw.githubusercontent.com/hayoi/photo/master/image/settings.png)
 
 ## Create HomeView
-
 1. Create a Flutter project with Android Studio.
 2. Right tap lib folder to open the plugin, select "New"-->"Generate App Template".
 3. Type "Home" in PageName Field, select "Get" checkbox. select BottomTabBar checkbox for a BottomNavigationBar. Type "User" in the Model Entry Name. Copy User json to Json Field from [Unsplash User Api](https://unsplash.com/documentation#get-a-users-public-profile). Tap "OK" buttom.
@@ -36,8 +37,6 @@ Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).
  	widget = PageView(
         children: <Widget>[DiscoverView(), CollectListView(), MeView()],
  ```
- ![home](https://raw.githubusercontent.com/hayoi/photo/master/image/home1.png)
- 
  ### Set Server Address
  Edit network_common.dart according [Unsplash Public Action Api](https://unsplash.com/documentation#public-actions)
 ```dart
@@ -493,9 +492,5 @@ in me_view.dart
       onPressed: () => Navigator.of(context).pushNamed("/settings"),
     );
 ```
-Look! It's very easy to create app with plugin: Flutter App Template Generater. Check the source code for the detail.
-
-![home](https://raw.githubusercontent.com/hayoi/photo/master/image/discover_dark.png)
-![home](https://raw.githubusercontent.com/hayoi/photo/master/image/collection_list.png)
-![home](https://raw.githubusercontent.com/hayoi/photo/master/image/settings.png)
- 
+Look! It's very easy to create app with plugin: Flutter App Template Generater. Check the source code for the detail.  
+ ![discover](https://raw.githubusercontent.com/hayoi/photo/master/image/dicover.png)
