@@ -2,6 +2,7 @@
 
 A photo viewer create with a [Plugin](https://github.com/hayoi/haystack). It's so simple to create an Flutter app for Android and IOS.  
 Using [Unsplash Api](https://unsplash.com/documentation#get-a-photo).
+![home](https://raw.githubusercontent.com/hayoi/photo/master/image/dicover.png)
 
 ## Create HomeView
 
@@ -494,5 +495,7 @@ in me_view.dart
 ```
 Look! It's very easy to create app with plugin: Flutter App Template Generater. Check the source code for the detail.
 
-
+![home](https://raw.githubusercontent.com/hayoi/photo/master/image/discover_dark.png)
+![home](https://raw.githubusercontent.com/hayoi/photo/master/image/collection_list.png)
+![home](https://raw.githubusercontent.com/hayoi/photo/master/image/settings.png)
  
