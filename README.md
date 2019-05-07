@@ -492,5 +492,6 @@ in me_view.dart
       onPressed: () => Navigator.of(context).pushNamed("/settings"),
     );
 ```
-Look! It's very easy to create app with plugin: Flutter App Template Generater. Check the source code for the detail.  
+Look! It's very easy to create app with plugin: Flutter App Template Generater. Check the source code for the detail.
+Search the plugin in plugin market in Intillij IDEA and Android Studio, using it to help you to develop App.
  ![discover](https://raw.githubusercontent.com/hayoi/photo/master/image/dicover.png)
