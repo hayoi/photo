@@ -3,6 +3,14 @@ import 'package:dio/dio.dart';
 import 'package:photo/data/model/page_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:flutter_oauth_rework/lib/token.dart';
+import 'package:flutter_oauth_rework/lib/model/config.dart';
+import 'package:flutter_oauth_rework/lib/flutter_auth.dart';
+import 'package:flutter_oauth_rework/lib/oauth.dart';
+import 'package:flutter_oauth_rework/lib/auth_code_information.dart';
+import 'package:flutter_oauth_rework/lib/oauth_token.dart';
+import 'package:flutter_oauth_rework/generated/i18n.dart';
+
 class NetworkCommon {
   static final NetworkCommon _singleton = new NetworkCommon._internal();
 
@@ -48,7 +56,8 @@ class NetworkCommon {
           int index = item.indexOf("&per_pag") > 0
               ? item.indexOf("&per_pag")
               : item.indexOf(">");
-          int number = int.parse(item.substring(item.indexOf("page=") + 5, index));
+          int number =
+              int.parse(item.substring(item.indexOf("page=") + 5, index));
           if (item.contains("first")) {
             page.first = number;
           } else if (item.contains("prev")) {
@@ -143,10 +152,44 @@ class NetworkCommon {
           "Response From:${response.request.method},${response.request.baseUrl}${response.request.path}");
       print("Response From:${response.toString()}");
       return response; // continue
-    }, onError: (DioError e) {
+    }, onError: (DioError e) async {
       // Do something with response error
-      return DioError; //continue
+      if (e.response?.statusCode == 401) {
+//        var authResp =
+//            await new Dio().get(authorizationEndpoint, queryParameters: {
+//          "client_id": identifier,
+//          "redirect_uri": redirectUrl,
+//          "response_type": "code",
+//          "scope":
+//              "public+read_user+write_user+read_photos+write_photos+write_likes+write_followers+read_collections+write_collections"
+//        });
+//        print(authResp??"err");
+        Map<String, String> customParameters = {
+          "scope":
+              "public+read_user+write_user+read_photos+write_photos+write_likes+write_followers+read_collections+write_collections"
+        };
+
+        final OAuth flutterOAuth = new FlutterOAuth(new Config(
+            authorizationEndpoint,
+            tokenEndpoint,
+            identifier,
+            secret,
+            redirectUrl,
+            "code",
+            parameters: customParameters));
+        Token token = await flutterOAuth.performAuthorization();
+        print(token.toString());
+      }
+      return e; //continue
     }));
     return dio;
   }
 }
+
+final authorizationEndpoint = "https://unsplash.com/oauth/authorize";
+final tokenEndpoint = "https://unsplash.com/oauth/token";
+final identifier =
+    "e993cde7a4d49aa482dd572dfca4dd27891fc573c4f5bed7f202e156e02b8e8e";
+final secret =
+    "98647647615be9bee8a75473574b380829b7ddfb0f97efab0fd708cb8596b6b5";
+final redirectUrl = "http://localhost:8080";

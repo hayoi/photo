@@ -5,23 +5,23 @@ import 'package:photo/redux/app/app_state.dart';
 import 'package:photo/redux/user/user_actions.dart';
 
 class MeViewModel {
-  final User user;
-  final Function() getUser;
-  final ActionReport getUserReport;
+  final User profile;
+  final Function() getMe;
+  final ActionReport getProfileReport;
 
   MeViewModel({
-    this.user,
-    this.getUser,
-    this.getUserReport,
+    this.profile,
+    this.getMe,
+    this.getProfileReport,
   });
 
   static MeViewModel fromStore(Store<AppState> store) {
     return MeViewModel(
-      user: store.state.userState.user,
-      getUser: () {
-        store.dispatch(GetUserAction());
+      profile: store.state.userState.profile,
+      getMe: () {
+        store.dispatch(GetMeAction());
       },
-      getUserReport: store.state.userState.status["GetUserAction"],
+      getProfileReport: store.state.userState.status["GetMeAction"],
     );
   }
 }

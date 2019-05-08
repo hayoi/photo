@@ -3,6 +3,12 @@ import 'package:photo/data/model/user_data.dart';
 import 'package:photo/redux/action_report.dart';
 import 'package:photo/data/model/page_data.dart';
 
+class GetMeAction {
+  final String actionName = "GetMeAction";
+
+  GetMeAction();
+}
+
 class GetUsersAction {
   final String actionName = "GetUsersAction";
   final bool isRefresh;

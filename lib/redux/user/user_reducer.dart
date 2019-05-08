@@ -6,6 +6,7 @@ final userReducer = combineReducers<UserState>([
   TypedReducer<UserState, UserStatusAction>(_userStatus),
   TypedReducer<UserState, SyncUsersAction>(_syncUsers),
   TypedReducer<UserState, SyncUserAction>(_syncUser),
+  TypedReducer<UserState, SyncProfileAction>(_syncProfile),
   TypedReducer<UserState, RemoveUserAction>(_removeUser),
 ]);
 

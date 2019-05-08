@@ -35,6 +35,7 @@ class _MeViewContentState extends State<MeViewContent> {
   @override
   void initState() {
     super.initState();
+    this.widget.viewModel.getMe();
   }
 
   @override

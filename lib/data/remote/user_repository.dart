@@ -49,7 +49,13 @@ class UserRepository {
       return 0;
     });
   }
+  Future<User> getMe() {
+    return new NetworkCommon().dio.get("me").then((d) {
+      var results = new NetworkCommon().decodeResp(d);
 
+      return new User.fromJson(results);
+    });
+  }
   Future<User> getUser(String id) {
     return new NetworkCommon().dio.get("user/", queryParameters: {"id": id}).then((d) {
       var results = new NetworkCommon().decodeResp(d);

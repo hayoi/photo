@@ -11,6 +11,7 @@ List<Middleware<AppState>> createUserMiddleware([
   UserRepository _repository = const UserRepository(),
 ]) {
   final login = _createLogin(_repository);
+  final getMe = _createGetMe(_repository);
   final getUser = _createGetUser(_repository);
   final getUsers = _createGetUsers(_repository);
   final createUser = _createCreateUser(_repository);
@@ -19,6 +20,7 @@ List<Middleware<AppState>> createUserMiddleware([
 
   return [
     TypedMiddleware<AppState, UserLoginAction>(login),
+    TypedMiddleware<AppState, GetMeAction>(getMe),
     TypedMiddleware<AppState, GetUserAction>(getUser),
     TypedMiddleware<AppState, GetUsersAction>(getUsers),
     TypedMiddleware<AppState, CreateUserAction>(createUser),
@@ -37,6 +39,19 @@ Middleware<AppState> _createLogin(
     }).catchError((error) {
       catchError(next, action, error);
     });
+  };
+}
+
+Middleware<AppState> _createGetMe(
+    UserRepository repository) {
+  return (Store<AppState> store, dynamic action, NextDispatcher next) {
+      running(next, action);
+      repository.getMe().then((item) {
+        next(SyncProfileAction(profile: item));
+        completed(next, action);
+      }).catchError((error) {
+        catchError(next, action, error);
+      });
   };
 }
 
